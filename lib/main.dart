@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+Future<void> main() async {
+  // new informamtion
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const MyApp());
 }
 
@@ -15,9 +23,10 @@ class MyApp extends StatelessWidget {
       title: 'MHW',
       theme: ThemeData(
         // UI
-        brightness: Brightness.dark,
-        primaryColor: Color(0xffef5b5b),
-        accentColor: Colors.cyan[600],
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+        primaryColor: const Color(0xffef5b5b),
+        // accentColor: Colors.cyan[600],
 
         // font
         // fontFamily: 'ariel',
@@ -45,29 +54,40 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: customAppBar("MHW"),
+        appBar: customAppBar(" "),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              GestureDetector(
-                  onTap: () {
-                    navigate(
-                        context,
-                        const SignUpPage(
-                          pageNo: 1,
-                        ));
-                  },
-                  child: button(context, "Sign Up", false)),
-              SizedBox(
-                height: 20,
+              Image(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  height: MediaQuery.of(context).size.width * 0.5,
+                  image: const AssetImage('images/logov3.png')),
+              Container(
+                height: 120,
+                child: Column(
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          navigate(
+                              context,
+                              const SignUpPage(
+                                pageNo: 1,
+                              ));
+                        },
+                        child: button(context, "Sign Up", false)),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          navigate(context, const LoginPage());
+                        },
+                        child: button(context, "Log In", false)),
+                  ],
+                ),
               ),
-              GestureDetector(
-                  onTap: () {
-                    navigate(context, const LoginPage());
-                  },
-                  child: button(context, "Log In", false)),
             ],
           ),
         ));
@@ -195,10 +215,18 @@ class _SignUpPageState extends State<SignUpPage> {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                button(context, "Finish", false)
+                GestureDetector(
+                    onTap: () {
+                      navigate(
+                          context,
+                          const Collections(
+                            isArtist: false,
+                          ));
+                    },
+                    child: button(context, "Finish", false))
               ],
             ));
   }
@@ -218,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: customAppBar("Step 1 of 2"),
+        appBar: customAppBar("Welcome Back"),
         body: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -234,7 +262,11 @@ class _LoginPageState extends State<LoginPage> {
             ),
             GestureDetector(
                 onTap: () {
-                  navigate(context, Collections());
+                  navigate(
+                      context,
+                      const Collections(
+                        isArtist: true,
+                      ));
                 },
                 child: button(context, "Login", false))
           ],
@@ -243,8 +275,8 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class Collections extends StatefulWidget {
-  const Collections({Key? key}) : super(key: key);
-
+  const Collections({Key? key, required this.isArtist}) : super(key: key);
+  final bool isArtist;
   @override
   _CollectionsState createState() => _CollectionsState();
 }
@@ -252,180 +284,542 @@ class Collections extends StatefulWidget {
 class _CollectionsState extends State<Collections> {
   int _selectedIndex = 0;
   bool _minimized = true;
-
+  TextEditingController? collectionName;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Row(
-        // mainAxisSize: MainAxisSize.max,
-        children: [
-          Center(
-            child: _minimized
-                ? SizedBox()
-                : NavigationRail(
-                    groupAlignment: 0.25,
-                    backgroundColor: Colors.black,
-                    selectedIndex: _selectedIndex,
-                    // elevation: 0,
-                    onDestinationSelected: (int index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    labelType: NavigationRailLabelType.selected,
-                    destinations: [
-                      sidenavItem(
-                          Icons.collections_outlined, Icons.collections),
-                      sidenavItem(Icons.receipt_outlined, Icons.receipt),
-                      sidenavItem(Icons.account_balance_wallet_outlined,
-                          Icons.account_balance_wallet),
-                      sidenavItem(Icons.person_outline, Icons.person),
-                      sidenavItem(Icons.logout_outlined, Icons.logout),
-                    ],
-                  ),
-          ),
-          const VerticalDivider(thickness: 0, width: 0),
-          // This is the main content.
-          Expanded(
-            child: Container(
-              // padding: EdgeInsets.all(20),
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: _selectedIndex == 0
-                    ? [
-                        // collections
-                        appBarK(context, _minimized, () {
-                          setState(() {
-                            _minimized = !_minimized;
-                          });
-                        }, "Collections"),
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.9,
-                          child: ListView(children: [
-                             collectionItem(
-                                  context, 'images/2.jpg', 20, "Wynwood", 5),
-                            
-                            collectionItem(
-                                context, 'images/3.jpg', 30, "70th Ave", 21),
-                            collectionItem(
-                                context, 'images/4.jpg', 12, "Brickell", 11),
-                            collectionItem(
-                                context, 'images/2.jpg', 15, "Hialeah Arts", 5),
-                            collectionItem(
-                                context, 'images/3.jpg', 20, "Wynwood", 5),
-                            collectionItem(
-                                context, 'images/4.jpg', 20, "Wynwood", 5),
-                            collectionItem(
-                                context, 'images/4.jpg', 20, "Wynwood", 5),
-                            collectionItem(
-                                context, 'images/2.jpg', 20, "Wynwood", 5),
-                          ]),
+    return widget.isArtist
+        ? Scaffold(
+            backgroundColor: Colors.white,
+            body: Row(
+              // mainAxisSize: MainAxisSize.max,
+              children: [
+                Center(
+                  child: _minimized
+                      ? SizedBox()
+                      : NavigationRail(
+                          groupAlignment: 0.25,
+                          backgroundColor: Colors.black,
+                          selectedIndex: _selectedIndex,
+                          // elevation: 0,
+                          onDestinationSelected: (int index) {
+                            setState(() {
+                              _selectedIndex = index;
+                            });
+                          },
+                          labelType: NavigationRailLabelType.selected,
+                          destinations: [
+                            sidenavItem(Icons.collections_outlined,
+                                Icons.collections, false),
+                            sidenavItem(
+                                Icons.receipt_outlined, Icons.receipt, false),
+                            sidenavItem(Icons.account_balance_wallet_outlined,
+                                Icons.account_balance_wallet, false),
+                            sidenavItem(
+                                Icons.person_outline, Icons.person, false),
+                            sidenavItem('images/nftlo.png',
+                                'images/nftlogo_outlined.png', true),
+                            sidenavItem(
+                                Icons.logout_outlined, Icons.logout, false),
+                          ],
                         ),
-                      ]
-                    : _selectedIndex == 1
-                        ? [
-                            // transactions
-                            appBarK(context, _minimized, () {
-                              setState(() {
-                                _minimized = !_minimized;
-                              });
-                            }, "Transactions"),
-                            Container(
-                              color: Colors.blue,
-                              height: 120,
-                              width: 40,
-                            )
-                          ]
-                        : _selectedIndex == 2
-                            ? [
-                                // wallets
-                                appBarK(context, _minimized, () {
-                                  setState(() {
-                                    _minimized = !_minimized;
-                                  });
-                                }, "Wallets"),
-
-                                Image(
-                                    height: 100,
-                                    width: 100,
-                                    image: AssetImage('images/10300.png')),
-                                Center(
-                                  child: Text(
-                                    "Miamicoin",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.7,
-                                    child: Column(
-                                      children: [
-                                        SizedBox(height: 20),
-                                        details("Balance:", "12.424 MIA", 20),
-                                        SizedBox(height: 20),
-                                        details("Earnings:", "+5.664", 20),
-                                        SizedBox(height: 20),
-                                        details(
-                                            "Top Collection:", "Ambi3nt", 20),
-                                        SizedBox(height: 20),
-                                      ],
-                                    )),
-                              ]
-                            : _selectedIndex == 3
-                                ? [
-                                    appBarK(context, _minimized, () {
-                                      setState(() {
-                                        _minimized = !_minimized;
-                                      });
-                                    }, "Profile"),
-                                    profileItem(context, 'images/prof.jpg', 20,
-                                        "Leon", 5, 20),
-                                  ]
-                                : [
-                                    Container(
-                                      height:
-                                          MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.7,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                ),
+                const VerticalDivider(thickness: 0, width: 0),
+                // This is the main content.
+                Expanded(
+                  child: Container(
+                    // padding: EdgeInsets.all(20),
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: _selectedIndex == 0
+                          ? [
+                              // collections
+                              appBarK(context, _minimized, () {
+                                setState(() {
+                                  _minimized = !_minimized;
+                                });
+                              }, "Collections"),
+                              Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.9,
+                                child: ListView(children: [
+                                  collectionItem(context, 'images/4.jpg', 20,
+                                      "Wynwood", 5),
+                                  collectionItem(context, 'images/car.png', 30,
+                                      "70th Ave", 21),
+                                  collectionItem(context, 'images/4.jpg', 12,
+                                      "Brickell", 11),
+                                  collectionItem(context, 'images/2.jpg', 15,
+                                      "Hialeah Arts", 5),
+                                  collectionItem(context, 'images/3.jpg', 20,
+                                      "Wynwood", 5),
+                                  collectionItem(context, 'images/4.jpg', 20,
+                                      "Wynwood", 5),
+                                  collectionItem(context, 'images/4.jpg', 20,
+                                      "Wynwood", 5),
+                                  collectionItem(context, 'images/2.jpg', 20,
+                                      "Wynwood", 5),
+                                ]),
+                              ),
+                            ]
+                          : _selectedIndex == 1
+                              ? [
+                                  // transactions
+                                  appBarK(context, _minimized, () {
+                                    setState(() {
+                                      _minimized = !_minimized;
+                                    });
+                                  }, "Transactions"),
+                                Column(
                                         mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            "Are you sure you want to log out?",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 20),
+                                          SizedBox(height: 30,),
+                                          Center(
+                                            child: Container(
+                                              child: Text("Feature Under development, check again soon!"),
+                                              
+                                            ),
                                           ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  Navigator.pop(context);
-                                                });
-                                              },
-                                              child: button(
-                                                  context, "log out", false)),
                                         ],
+                                      )
+                                ]
+                              : _selectedIndex == 2
+                                  ? [
+                                      // wallets
+                                      appBarK(context, _minimized, () {
+                                        setState(() {
+                                          _minimized = !_minimized;
+                                        });
+                                      }, "Wallets"),
+
+                                      Image(
+                                          height: 100,
+                                          width: 100,
+                                          image:
+                                              AssetImage('images/10300.png')),
+                                      Center(
+                                        child: Text(
+                                          "Miamicoin",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-              ),
+                                      Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.7,
+                                          child: Column(
+                                            children: [
+                                              SizedBox(height: 20),
+                                              details(
+                                                  "Balance:", "1245.424 MIA", 20),
+                                              SizedBox(height: 20),
+                                              details(
+                                                  "Earnings:", "+5.674", 20),
+                                              SizedBox(height: 20),
+                                              details("Top Collection:",
+                                                  "Ambi3nt", 20),
+                                              SizedBox(height: 20),
+                                            ],
+                                          )),
+                                    ]
+                                  : _selectedIndex == 3
+                                      ? [
+                                          appBarK(context, _minimized, () {
+                                            setState(() {
+                                              _minimized = !_minimized;
+                                            });
+                                          }, "Profile"),
+                                          profileItem(
+                                              context,
+                                              'images/prof.jpg',
+                                              100,
+                                              "Leon",
+                                              51,
+                                              20070),
+                                        ]
+                                      : _selectedIndex == 4
+                                          ? [
+                                              appBarK(context, _minimized, () {
+                                                setState(() {
+                                                  _minimized = !_minimized;
+                                                });
+                                              }, "Create NFT"),
+                                              Column(
+                                                mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                                mainAxisSize:MainAxisSize.max,
+                                                children: [
+                                                  
+                                                  Container(
+                                                    width:MediaQuery.of(context).size.width*0.75,
+                                                    child: formInput(
+                                                        context,
+                                                        collectionName,
+                                                        "Collection Name",
+                                                        false),
+                                                  ),
+                                                  Container(
+                                                    decoration:BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(6),
+                                                      // border:Border.all(color:Colors.black,width:2.0),
+                                                      color: Color(0xffF8F8F8),
+                                                    ),
+                                                    
+                                                    height:  MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.5,
+                                                    width: MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.7,
+                                                    child: Center(child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                         ImageIcon(
+                                                            AssetImage("images/2d.png"),
+                                                            size: 40,
+                                                            color: Color(0xff50514f),
+                                                          ),
+                                                        Text("2D image",style: TextStyle(fontSize: 20,color: Color(0xff50514f)),),
+                                                      ],
+                                                    )),
+                                                  ),
+                                                  SizedBox(height: 20,),
+                                                  Container(
+                                                    decoration:BoxDecoration(
+                                                       borderRadius: BorderRadius.circular(6),
+                                                      // border:Border.all(color:Colors.black,width:2.0),
+                                                      color: Color(0xffF8F8F8),
+                                                    ),
+                                                    
+                                                    height:  MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.5,
+                                                    width: MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.7,
+                                                    child: Center(child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                         ImageIcon(
+                                                            AssetImage("images/3d.png"),
+                                                            size: 40,
+                                                            color: Color(0xff50514f),
+                                                          ),
+                                                        Text("3D image",style: TextStyle(fontSize: 20,color: Color(0xff50514f)),),
+                                                      ],
+                                                    )),),
+                                                  
+                                                  SizedBox(height: 20,),
+                                                  Container(
+                                                    padding: const EdgeInsets.only(top:10,left: 10,right:10),
+                                                    width:MediaQuery.of(context).size.width*0.7,
+                                                    color: Colors.black,
+                                                    child: Column(
+                                                      
+                                                      children: [
+                                                        const Center(
+                                                          child:  Image(
+                                                            height:40,
+                                                            width:40,
+                                                            image: AssetImage("images/nftlo.png"),
+                                                          color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        button(
+                                                            context, "Mint", false),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ]
+                                          : [
+                                              Container(
+                                                height: MediaQuery.of(context)
+                                                    .size
+                                                    .height,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Text(
+                                                      "Are you sure you want to log out?",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 20),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                    GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            Navigator.pop(
+                                                                context);
+                                                          });
+                                                        },
+                                                        child: button(context,
+                                                            "log out", false)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                    ),
+                  ),
+                )
+              ],
             ),
           )
-        ],
-      ),
-    );
+        : Scaffold(
+            backgroundColor: Colors.white,
+            body: Row(
+              // mainAxisSize: MainAxisSize.max,
+              children: [
+                Center(
+                  child: _minimized
+                      ? SizedBox()
+                      : NavigationRail(
+                          groupAlignment: 0.25,
+                          backgroundColor: Colors.black,
+                          selectedIndex: _selectedIndex,
+                          // elevation: 0,
+                          onDestinationSelected: (int index) {
+                            setState(() {
+                              _selectedIndex = index;
+                            });
+                          },
+                          labelType: NavigationRailLabelType.selected,
+                          destinations: [
+                            sidenavItem('images/nftlo.png',
+                                'images/nftlogo_outlined.png', true),
+                            sidenavItem(Icons.collections_outlined,
+                                Icons.collections, false),
+                            sidenavItem(
+                                Icons.receipt_outlined, Icons.receipt, false),
+                            sidenavItem(Icons.account_balance_wallet_outlined,
+                                Icons.account_balance_wallet, false),
+                            sidenavItem(
+                                Icons.person_outline, Icons.person, false),
+                            sidenavItem(
+                                Icons.logout_outlined, Icons.logout, false),
+                          ],
+                        ),
+                ),
+                const VerticalDivider(thickness: 0, width: 0),
+                // This is the main content.
+                Expanded(
+                  child: Container(
+                    // padding: EdgeInsets.all(20),
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: _selectedIndex == 0
+                          ? [
+                              // collections
+                              appBarK(context, _minimized, () {
+                                setState(() {
+                                  _minimized = !_minimized;
+                                });
+                              }, "My Collections"),
+                              Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.91,
+                                child: ListView(children: [
+                                  collectionItemUser(context, 'images/FLAMINGO_ORIGINAL.png',
+                                      8, "Dolph-Str33t", "Mogere"),
+                                  collectionItemUser(context, 'images/3.jpg',
+                                      30, "District 28", "Mogere"),
+                                  collectionItemUser(context, 'images/4.jpg',
+                                      12, "District 28", "Cecilia"),
+                                  collectionItemUser(context, 'images/2.jpg',
+                                      15, "District 28", "Mogere"),
+                                  collectionItemUser(context, 'images/3.jpg',
+                                      20, "District 28", "Ceilia"),
+                                  collectionItemUser(context, 'images/4.jpg',
+                                      20, "District 28", "Koech"),
+                                  collectionItemUser(context, 'images/4.jpg',
+                                      20, "District 28", "Leon"),
+                                  collectionItemUser(context, 'images/2.jpg',
+                                      20, "District 28", "Moises"),
+                                ]),
+                              ),
+                            ]
+                          : _selectedIndex == 1
+                              ? [
+                                  // collections
+                                  appBarK(context, _minimized, () {
+                                    setState(() {
+                                      _minimized = !_minimized;
+                                    });
+                                  }, "Collections"),
+                                  Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.91,
+                                    child: ListView(children: [
+                                       collectionItem(context, 'images/4.jpg', 20,
+                                      "Wynwood", 5),
+                                  collectionItem(context, 'images/car.png', 30,
+                                      "70th Ave", 21),
+                                      collectionItem(context, 'images/4.jpg',
+                                          12, "Brickell", 11),
+                                      collectionItem(context, 'images/2.jpg',
+                                          15, "Hialeah Arts", 5),
+                                      collectionItem(context, 'images/3.jpg',
+                                          20, "Wynwood", 5),
+                                      collectionItem(context, 'images/4.jpg',
+                                          20, "Wynwood", 5),
+                                      collectionItem(context, 'images/4.jpg',
+                                          20, "Wynwood", 5),
+                                      collectionItem(context, 'images/2.jpg',
+                                          20, "Wynwood", 5),
+                                    ]),
+                                  ),
+                                ]
+                              : _selectedIndex == 2
+                                  ? [
+                                      // transactions
+                                      appBarK(context, _minimized, () {
+                                        setState(() {
+                                          _minimized = !_minimized;
+                                        });
+                                      }, "Transactions"),
+                                      Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(height: 30,),
+                                          Center(
+                                            child: Container(
+                                              child: Text("Feature Under development, check again soon!"),
+                                              
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ]
+                                  : _selectedIndex == 3
+                                      ? [
+                                          // wallets
+                                          appBarK(context, _minimized, () {
+                                            setState(() {
+                                              _minimized = !_minimized;
+                                            });
+                                          }, "Wallets"),
+
+                                          Image(
+                                              height: 100,
+                                              width: 100,
+                                              image: AssetImage(
+                                                  'images/10300.png')),
+                                          Center(
+                                            child: Text(
+                                              "Miamicoin",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7,
+                                              child: Column(
+                                                children: [
+                                                  SizedBox(height: 20),
+                                                  details("Balance:",
+                                                      "1678 MIA", 20),
+                                                  SizedBox(height: 20),
+                                                  details("Earnings:", "125.664",
+                                                      20),
+                                                  SizedBox(height: 20),
+                                                  details("Top Collection:",
+                                                      "Ambi3nt", 20),
+                                                  SizedBox(height: 20),
+                                                ],
+                                              )),
+                                        ]
+                                      : _selectedIndex == 4
+                                          ? [
+                                              appBarK(context, _minimized, () {
+                                                setState(() {
+                                                  _minimized = !_minimized;
+                                                });
+                                              }, "Profile"),
+                                              profileItem_User(
+                                                  context,
+                                                  'images/56.jpg',
+                                                  25,
+                                                  "Mogere",
+                                                  130,
+                                                  130),
+                                            ]
+                                          : [
+                                              Container(
+                                                height: MediaQuery.of(context)
+                                                    .size
+                                                    .height,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Text(
+                                                      "Are you sure you want to log out?",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 20),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                    GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            Navigator.pop(
+                                                                context);
+                                                          });
+                                                        },
+                                                        child: button(context,
+                                                            "log out", false)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
   }
 }
 
@@ -466,33 +860,122 @@ class _ViewCollectionState extends State<ViewCollection> {
       body: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
         child: ListView(
-          children: [
-            nftItem(context, 'images/2.jpg', "Narnia", 120, "MIA"),
-            nftItem(context, 'images/3.jpg', "Narnia", 120, "MIA"),
-            nftItem(context, 'images/4.jpg', "Narnia", 120, "MIA"),
-            nftItem(context, 'images/3.jpg', "Narnia", 120, "MIA"),
-            nftItem(context, 'images/2.jpg', "Narnia", 120, "MIA"),
-          ],
+          children: widget.name == "Wynwood"
+              ? [
+                  nftItem(
+                      context, 'images/collection/1.png', "Narnia", 120, "MIA"),
+                  nftItem(
+                      context, 'images/collection/2.png', "Narnia", 120, "MIA"),
+                  nftItem(
+                      context, 'images/collection/3.png', "Narnia", 120, "MIA"),
+                  nftItem(
+                      context, 'images/collection/4.png', "Narnia", 120, "MIA"),
+                  nftItem(
+                      context, 'images/collection/5.png', "Narnia", 120, "MIA"),
+                ]
+              : widget.name == "70th Ave"
+                  ? [
+                      nftItem(context, 'images/car.png', "Gari", 120, "MIA"),
+                    ]
+                  : [
+                      nftItem(context, 'images/2.jpg', "Narnia", 120, "MIA"),
+                      nftItem(context, 'images/3.jpg', "Narnia", 120, "MIA"),
+                      nftItem(context, 'images/4.jpg', "Narnia", 120, "MIA"),
+                      nftItem(context, 'images/3.jpg', "Narnia", 120, "MIA"),
+                      nftItem(context, 'images/2.jpg', "Narnia", 120, "MIA"),
+                    ],
         ),
       ),
     );
   }
 }
 
-NavigationRailDestination sidenavItem(icon1, icon2) {
-  return NavigationRailDestination(
-    icon: Icon(
-      icon1,
-      size: 40,
-      color: Color(0xff50514f),
-    ),
-    selectedIcon: Icon(
-      icon2,
-      size: 40,
-      color: Color(0xfff5cf05),
-    ),
-    label: Text(''),
-  );
+class CreateNFT extends StatefulWidget {
+  const CreateNFT({Key? key}) : super(key: key);
+
+  @override
+  _CreateNFTState createState() => _CreateNFTState();
+}
+
+class _CreateNFTState extends State<CreateNFT> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold();
+  }
+}
+
+class ViewInAR extends StatefulWidget {
+  const ViewInAR({Key? key}) : super(key: key);
+
+  @override
+  _ViewInARState createState() => _ViewInARState();
+}
+
+class _ViewInARState extends State<ViewInAR> {
+  // String recongizedImage='';
+  // ArCoreViewController arCoreViewController=new ArCoreViewController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    return Scaffold(
+        backgroundColor: Colors.blue,
+        appBar: AppBar(
+          title: const Text('ArCoreViewExample'),
+          backgroundColor: Colors.black,
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Text("aloha"),
+          //     child: ArCoreView(
+          //   focusBox: Container(
+          //     width: screenSize.width * 0.5,
+          //     height: screenSize.width * 0.5,
+          //     decoration: BoxDecoration(
+          //         border: Border.all(width: 1, style: BorderStyle.solid)),
+          //   ),
+          //   width: screenSize.width,
+          //   height: screenSize.height,
+          //   onImageRecognized: _onImageRecognized,
+          //   // onArCoreViewCreated: _onArCoreViewCreated,
+          // )
+        ));
+  }
+}
+
+NavigationRailDestination sidenavItem(icon1, icon2, isPng) {
+  return isPng
+      ? NavigationRailDestination(
+          icon: ImageIcon(
+            AssetImage(icon1),
+            size: 40,
+            color: Color(0xff50514f),
+          ),
+          selectedIcon: ImageIcon(
+            AssetImage(icon2),
+            size: 40,
+            color: Color(0xfff5cf05),
+          ),
+          label: Text(''),
+        )
+      : NavigationRailDestination(
+          icon: Icon(
+            icon1,
+            size: 40,
+            color: Color(0xff50514f),
+          ),
+          selectedIcon: Icon(
+            icon2,
+            size: 40,
+            color: Color(0xfff5cf05),
+          ),
+          label: Text(''),
+        );
 }
 
 Widget appBarK(context, _minimized, Function() fun, name) {
@@ -540,8 +1023,12 @@ Widget appBarK(context, _minimized, Function() fun, name) {
 Widget collectionItem(context, img, itemCount, name, itemsSold) {
   return GestureDetector(
     onTap: () {
-                                navigate(context, ViewCollection(name: name,));
-                              },
+      navigate(
+          context,
+          ViewCollection(
+            name: name,
+          ));
+    },
     child: Container(
       // height: 120,
       // padding: EdgeInsets.all(8.0),
@@ -572,6 +1059,53 @@ Widget collectionItem(context, img, itemCount, name, itemsSold) {
                   details("Items Count:", itemCount.toString(), 18),
                   // details("Name:", Name),
                   details("Items Sold:", itemsSold.toString(), 18),
+                ],
+              ))
+        ],
+      ),
+    ),
+  );
+}
+
+Widget collectionItemUser(context, img, itemCount, name, artistName) {
+  return GestureDetector(
+    onTap: () {
+      navigate(
+          context,
+          ViewCollection(
+            name: name,
+          ));
+    },
+    child: Container(
+      // height: 120,
+      // padding: EdgeInsets.all(8.0),
+      // color: Colors.black,
+      margin: EdgeInsets.only(top: 20, bottom: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text(
+            name,
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+          ),
+          Container(
+              margin: EdgeInsets.only(top: 15, bottom: 15),
+              width: MediaQuery.of(context).size.width * 0.6,
+              height: MediaQuery.of(context).size.width * 0.6,
+              decoration: new BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: new DecorationImage(
+                      fit: BoxFit.cover, image: new AssetImage(img)))),
+          Container(
+              width: MediaQuery.of(context).size.width * 0.7,
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  details("Items Count:", itemCount.toString(), 18),
+                  // details("Name:", Name),
+                  details("Artist:", artistName, 18),
                 ],
               ))
         ],
@@ -613,6 +1147,47 @@ Widget profileItem(context, img, itemCount, name, itemsSold, earnings) {
                 // details("Name:", Name),
                 details("Items Sold:", itemsSold.toString(), 18),
                 details("Earnings:", earnings.toString() + " MIA", 18),
+                details("Date Joined:",
+                    DateFormat.yMMMd().format(DateTime.now()).toString(), 18),
+              ],
+            ))
+      ],
+    ),
+  );
+}
+Widget profileItem_User(context, img, itemCount, name, itemsSold, earnings) {
+  return Container(
+    // height: 120,
+    // padding: EdgeInsets.all(8.0),
+    // color: Colors.black,
+    margin: EdgeInsets.only(top: 20, bottom: 20),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Text(
+          name,
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        Container(
+            margin: EdgeInsets.only(top: 15, bottom: 15),
+            width: MediaQuery.of(context).size.width * 0.6,
+            height: MediaQuery.of(context).size.width * 0.6,
+            decoration: new BoxDecoration(
+                shape: BoxShape.circle,
+                image: new DecorationImage(
+                    fit: BoxFit.cover, image: new AssetImage(img)))),
+        Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                details("Collection Count:", itemCount.toString(), 18),
+                details("Items Bought:", itemsSold.toString(), 18),
+                // details("Name:", Name),
+                // details("Items Sold:", itemsSold.toString(), 18),
+                // details("Earnings:", earnings.toString() + " MIA", 18),
                 details("Date Joined:",
                     DateFormat.yMMMd().format(DateTime.now()).toString(), 18),
               ],
@@ -727,7 +1302,11 @@ Widget nftItem(context, imageSRC, name, highestBid, currency) {
         SizedBox(
           height: 20,
         ),
-        button(context, "View in AR", true),
+        GestureDetector(
+            onTap: () {
+              navigate(context, ViewInAR());
+            },
+            child: button(context, "View in AR", true)),
         SizedBox(
           height: 20,
         ),

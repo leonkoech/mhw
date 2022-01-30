@@ -35,7 +35,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   intl: ^0.17.0
-  arkit_plugin: ^1.0.5
+  # arcore_plugin: ^0.2.0
+  fluttertoast: ^8.0.8
+  flutter_launcher_icons: ^0.9.2
+  # ar_flutter_plugin: ^0.6.2
+  # arkit_plugin: ^1.0.5
+  # model_viewer: ^0.8.1
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +57,14 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "images/48g.png"
+  image_path_android: "images/48g.png"
+  adaptive_icon_background: "images/48bg.png"
+  adaptive_icon_foreground: "images/48fg.png"
+
 flutter:
 
   # The following line ensures that the Material Icons font is
@@ -62,6 +75,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
+    - images/collection/
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
